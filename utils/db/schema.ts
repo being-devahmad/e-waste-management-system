@@ -37,7 +37,7 @@ export const Rewards = pgTable('reports', {
 })
 
 // CollectedWaste model
-export const CollectedWaste = pgTable('collected_waste', {
+export const CollectedWastes = pgTable('collected_waste', {
     id: serial('id').primaryKey(),
     reportId: integer('report_id').references(() => Reports.id).notNull(), // in reference with the reports table 
     collectorId: integer('collector_id').references(() => Users.id).notNull(), // in reference with the users table 
