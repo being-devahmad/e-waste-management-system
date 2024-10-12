@@ -62,5 +62,5 @@ export const Transactions = pgTable('transactions', {
     type: varchar('type', { length: 20 }).notNull(),
     amount: integer('amount').notNull(),
     description: text('description').notNull(),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
+    date: timestamp('date').defaultNow().notNull(),
 })

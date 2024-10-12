@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { useState } from "react";
 import { Toaster } from "react-hot-toast";
+import Header from "../components/Header";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -17,7 +18,7 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export default function RootLayout({
+export default function RootLayout({ 
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -34,6 +35,7 @@ export default function RootLayout({
 
         <div className="min-h-screen bg-gray-50 flex flex-col">
           {/* Header */}
+          <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} totalEarnings={totalEarnings} />
           <div className="flex flex-1">
             {/* Sidebar */}
             <main className="flex-1 p-4 lg:p-8 ml-0 lg:ml-64 transition-all duration-300">
