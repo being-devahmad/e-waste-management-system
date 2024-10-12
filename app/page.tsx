@@ -29,6 +29,16 @@ function FeatureCard({ icon: Icon, title, description }: { icon: React.ElementTy
   )
 }
 
+function ImpactCard({ title, value, icon: Icon }: { title: string, value: string | number, icon: React.ElementType }) {
+  return (
+    <div className="p-6 rounded-xl bg-gray-50 border border-gray-100 transition-all duration-300 ease-in-out hover:shadow-md">
+      <Icon className='h-10 w-10 text-green-500 mb-4 ' />
+      <p className="text-3xl font-bold mb-2 text-gray-800">{value}</p>
+      <p className="text-sm text-gray-800">{title}</p>
+    </div>
+  )
+}
+
 
 export default function Home() {
   return (
@@ -62,6 +72,34 @@ export default function Home() {
             icon={Leaf}
             title="Community Driven"
             description="We are committed to reducing waste and promoting sustainability" />
+        </section>
+
+
+
+        <section className="bg-white p-10 rounded-3xl shadow-lg mb-20">
+          <h2 className="text-4xl font-bold mb-12 text-center text-gray-800">Our Impact</h2>
+          <div className="grid md:grid-cols-4 gap-10 mb-20">
+            <ImpactCard
+              title={'Waste Collected'}
+              value={'20 Kg'}
+              icon={Recycle}
+            />
+            <ImpactCard
+              title={'Report Submitted'}
+              value={30}
+              icon={MapPin}
+            />
+            <ImpactCard
+              title={'Tokens Earned'}
+              value={200}
+              icon={Coins}
+            />
+            <ImpactCard
+              title={'CO2 Offset'}
+              value={'50 Kg'}
+              icon={Leaf}
+            />
+          </div>
         </section>
       </div>
     </>
