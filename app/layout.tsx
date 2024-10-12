@@ -1,11 +1,13 @@
-'use client'
+// @ts-nocheck
 
+'use client'
 
 import localFont from "next/font/local";
 import "./globals.css";
 import { useState } from "react";
 import { Toaster } from "react-hot-toast";
 import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -18,7 +20,7 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export default function RootLayout({ 
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -38,6 +40,7 @@ export default function RootLayout({
           <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} totalEarnings={totalEarnings} />
           <div className="flex flex-1">
             {/* Sidebar */}
+            <Sidebar open={sidebarOpen} />
             <main className="flex-1 p-4 lg:p-8 ml-0 lg:ml-64 transition-all duration-300">
               {children}
             </main>

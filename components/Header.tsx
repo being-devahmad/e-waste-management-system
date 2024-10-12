@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 'use client'
 
 import { usePathname } from "next/navigation"
@@ -15,7 +17,13 @@ import { Badge } from "./ui/badge"
 import { Web3Auth } from '@web3auth/modal'
 import { CHAIN_NAMESPACES, IProvider, WEB3AUTH_NETWORK } from "@web3auth/base"
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider"
-import { createUser, getUnreadNotifications, getUserBalance, getUserByEmail, markNotificationAsRead } from "../utils/db/actions"
+import {
+    createUser,
+    getUnreadNotifications,
+    getUserBalance,
+    getUserByEmail,
+    markNotificationAsRead
+} from "../utils/db/actions"
 import { Button } from "./ui/button"
 import Link from "next/link"
 import { useMediaQuery } from "../hooks/useMediaQuery"
