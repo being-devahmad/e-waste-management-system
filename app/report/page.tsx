@@ -195,6 +195,8 @@ export default function ReportPage() {
             setVerificationStatus('idle')
             setVerificationResult(null)
 
+            toast.success('Report submitted successfully')
+
         } catch (error) {
 
         }
