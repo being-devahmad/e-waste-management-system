@@ -212,3 +212,21 @@ export async function createNotification(
         return null
     }
 }
+
+export async function getRecentReports(
+    limit: number = 10
+) {
+    try {
+        const reports = await db
+            .select()
+            .from(Reports)
+            .orderBy(desc(Reports.createdAt))
+            .limit(limit)
+            .execute()
+
+    } catch (error) {
+        console.error("Error fetching recent reports", error)
+        return null
+    }
+
+}
