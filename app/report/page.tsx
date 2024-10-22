@@ -9,8 +9,8 @@ import { useRouter } from 'next/navigation';
 import { createUser, getUserByEmail, createReport, getRecentReports } from '../../utils/db/actions';
 import { toast } from 'react-hot-toast'
 
-const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 const libraries: Libraries = ['places'];
 
@@ -49,6 +49,8 @@ export default function ReportPage() {
         googleMapsApiKey: googleMapsApiKey!,
         libraries: libraries
     });
+
+    console.log("isLoaded-->", isLoaded)
 
     const onLoad = useCallback((ref: google.maps.places.SearchBox) => {
         setSearchBox(ref);
@@ -96,14 +98,15 @@ export default function ReportPage() {
     const handleVerify = async () => {
         if (!file) return
 
+        console.log("file", file)
         setVerificationStatus('verifying')
 
         try {
             const genAI = new GoogleGenerativeAI(geminiApiKey!);
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
+            const model = genAI.getGenerativeModel({
+                model: "gemini-1.5-flash"
+            });
             const base64Data = await readFileAsBase64(file);
-
             const imageParts = [
                 {
                     inlineData: {
@@ -112,6 +115,10 @@ export default function ReportPage() {
                     },
                 },
             ];
+
+            console.log("genAI-->", genAI)
+            console.log("model-->", model)
+            console.log("imageParts-->", imageParts)
 
             const prompt = `You are an expert in waste management and recycling. Analyze this image and provide:
         1. The type of waste (e.g., plastic, paper, glass, metal, organic)
@@ -128,6 +135,8 @@ export default function ReportPage() {
             const result = await model.generateContent([prompt, ...imageParts]);
             const response = await result.response;
             const text = response.text();
+            console.log("response------>", response)
+            console.log("text------>", text)
 
             try {
                 const parsedResult = JSON.parse(text);
@@ -202,16 +211,21 @@ export default function ReportPage() {
             if (email) {
                 let user = await getUserByEmail(email);
                 if (!user) {
-                    user = await createUser(email, 'Anonymous User');
+                    user = (await createUser(email, 'Anonymous User'))!;
                 }
-                setUser(user);
-
+                if (user) {
+                    setUser(user);
+                }
                 const recentReports = await getRecentReports();
-                const formattedReports = recentReports.map(report => ({
-                    ...report,
-                    createdAt: report.createdAt.toISOString().split('T')[0]
-                }));
-                setReports(formattedReports);
+                if (recentReports) {
+                    const formattedReports = (recentReports as any[]).map((report: any) => ({
+                        ...report,
+                        createdAt: report.createdAt.toISOString().split('T')[0]
+                    }));
+                    setReports(formattedReports);
+                } else {
+                    setReports([]);
+                }
             } else {
                 router.push('/login');
             }
@@ -221,7 +235,9 @@ export default function ReportPage() {
 
     return (
         <div className="p-8 max-w-4xl mx-auto">
-            <h1 className="text-3xl font-semibold mb-6 text-gray-800">Report waste</h1>
+            <h1 className="text-3xl font-semibold mb-6 text-gray-800">
+                Report waste
+            </h1>
 
             <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-lg mb-12">
                 <div className="mb-8">
@@ -255,7 +271,8 @@ export default function ReportPage() {
                 <Button
                     type="button"
                     onClick={handleVerify}
-                    className="w-full mb-8 bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg rounded-xl transition-colors duration-300"
+                    className="w-full mb-8 bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg rounded-xl 
+                    transition-colors duration-300"
                     disabled={!file || verificationStatus === 'verifying'}
                 >
                     {verificationStatus === 'verifying' ? (
@@ -284,7 +301,9 @@ export default function ReportPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                     <div>
-                        <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                        <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                            Location
+                        </label>
                         {isLoaded ? (
                             <StandaloneSearchBox
                                 onLoad={onLoad}
@@ -297,7 +316,8 @@ export default function ReportPage() {
                                     value={newReport.location}
                                     onChange={handleInputChange}
                                     required
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none 
+                                    focus:ring-2 focus:ring-green-500 transition-all duration-300"
                                     placeholder="Enter waste location"
                                 />
                             </StandaloneSearchBox>
@@ -329,7 +349,9 @@ export default function ReportPage() {
                         />
                     </div>
                     <div>
-                        <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">Estimated Amount</label>
+                        <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
+                            Estimated Amount
+                        </label>
                         <input
                             type="text"
                             id="amount"

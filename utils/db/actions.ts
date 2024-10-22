@@ -104,6 +104,7 @@ export async function createReport(
     wasteType: string,
     amount: string,
     imageUrl?: string,
+    type?: string,
     verificationResult?: any
 ) {
     try {
@@ -116,34 +117,30 @@ export async function createReport(
                 amount,
                 imageUrl,
                 verificationResult,
-                status: 'pending',
+                status: "pending",
             })
             .returning()
-            .execute()
+            .execute();
 
-        return report
-
+        // Award 10 points for reporting waste
         const pointsEarned = 10;
-        // updateRewardPoints
-        await updateRewardPoints(userId, pointsEarned)
-        // createTransaction
-        await createTransaction(
-            userId,
-            'earned_report',
-            pointsEarned,
-            'Points earned for reporting waste'
-        )
-        // createNotification
+        await updateRewardPoints(userId, pointsEarned);
+
+        // Create a transaction for the earned points
+        await createTransaction(userId, 'earned_report', pointsEarned, 'Points earned for reporting waste');
+
+        // Create a notification for the user
         await createNotification(
             userId,
-            `You have earned ${pointsEarned} points for reporting waste`,
-            "reward"
-        )
-        return report
-    } catch (error) {
-        console.error("Error creating report", error)
-    }
+            `You've earned ${pointsEarned} points for reporting waste!`,
+            'reward'
+        );
 
+        return report;
+    } catch (error) {
+        console.error("Error creating report:", error);
+        return null;
+    }
 }
 
 
