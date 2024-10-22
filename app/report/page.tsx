@@ -200,15 +200,17 @@ export default function ReportPage() {
         const checkUser = async () => {
             const email = localStorage.getItem('userEmail');
             if (email) {
-                let user = await getUserByEmail(email)
+                let user = await getUserByEmail(email);
+                if (!user) {
+                    user = await createUser(email, 'Anonymous User');
+                }
                 setUser(user);
 
                 const recentReports = await getRecentReports();
-                const formattedReports = recentReports &&
-                    recentReports.map((report) => ({
-                        ...report,
-                        createdAt: report.createdAt.toISOString().split('T')[0]
-                    }));
+                const formattedReports = recentReports.map(report => ({
+                    ...report,
+                    createdAt: report.createdAt.toISOString().split('T')[0]
+                }));
                 setReports(formattedReports);
             } else {
                 router.push('/login');
