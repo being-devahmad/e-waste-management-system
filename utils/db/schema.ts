@@ -13,7 +13,7 @@ export const Users = pgTable("users", {
 export const Reports = pgTable("reports", {
     id: serial('id').primaryKey(),
     userId: integer("user_id").references(() => Users.id).notNull(), // in reference with the users table 
-    location: text('locatin').notNull(),
+    location: text('location').notNull(),
     wasteType: varchar('waste_type', { length: 255 }).notNull(),
     amount: varchar('amount', { length: 255 }).notNull(),
     imageUrl: text('image_url'),
@@ -24,7 +24,7 @@ export const Reports = pgTable("reports", {
 })
 
 // Rewards model
-export const Rewards = pgTable('reports', {
+export const Rewards = pgTable('rewards', {
     id: serial('id').primaryKey(),
     userId: integer("user_id").references(() => Users.id).notNull(), // in reference with the users table 
     points: integer('points').notNull().default(0),

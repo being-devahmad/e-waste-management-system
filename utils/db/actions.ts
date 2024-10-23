@@ -113,6 +113,7 @@ export async function createReport(
             .values({
                 userId,
                 location,
+                collectorId: userId,
                 wasteType,
                 amount,
                 imageUrl,
