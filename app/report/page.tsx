@@ -1,17 +1,16 @@
 'use client'
 import { useState, useCallback, useEffect } from 'react'
 import { MapPin, Upload, CheckCircle, Loader } from 'lucide-react'
-import { Button } from '../../components/ui/button';
+import { Button } from '../../components/ui/button'
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { StandaloneSearchBox, useJsApiLoader } from '@react-google-maps/api'
 import { Libraries } from '@react-google-maps/api';
-import { useRouter } from 'next/navigation';
 import { createUser, getUserByEmail, createReport, getRecentReports } from '../../utils/db/actions';
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast'
 
 const geminiApiKey = process.env.GEMINI_API_KEY;
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
-
 const libraries: Libraries = ['places'];
 
 export default function ReportPage() {
@@ -50,13 +49,13 @@ export default function ReportPage() {
         libraries: libraries
     });
 
-    console.log("googleMapsApiKey", googleMapsApiKey)
-    console.log("libraries-->", libraries)
-    console.log("isLoaded-->", isLoaded)
 
     const onLoad = useCallback((ref: google.maps.places.SearchBox) => {
         setSearchBox(ref);
     }, []);
+
+    console.log('onLoad', onLoad)
+
 
     const onPlacesChanged = () => {
         if (searchBox) {
@@ -70,6 +69,9 @@ export default function ReportPage() {
             }
         }
     };
+
+    console.log("onPlacesChanged", onPlacesChanged)
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target
@@ -100,15 +102,14 @@ export default function ReportPage() {
     const handleVerify = async () => {
         if (!file) return
 
-        console.log("file", file)
         setVerificationStatus('verifying')
 
         try {
             const genAI = new GoogleGenerativeAI(geminiApiKey!);
-            const model = genAI.getGenerativeModel({
-                model: "gemini-1.5-flash"
-            });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
             const base64Data = await readFileAsBase64(file);
+
             const imageParts = [
                 {
                     inlineData: {
@@ -117,10 +118,6 @@ export default function ReportPage() {
                     },
                 },
             ];
-
-            console.log("genAI-->", genAI)
-            console.log("model-->", model)
-            console.log("imageParts-->", imageParts)
 
             const prompt = `You are an expert in waste management and recycling. Analyze this image and provide:
         1. The type of waste (e.g., plastic, paper, glass, metal, organic)
@@ -137,8 +134,6 @@ export default function ReportPage() {
             const result = await model.generateContent([prompt, ...imageParts]);
             const response = await result.response;
             const text = response.text();
-            console.log("response------>", response)
-            console.log("text------>", text)
 
             try {
                 const parsedResult = JSON.parse(text);
@@ -190,8 +185,13 @@ export default function ReportPage() {
                 createdAt: report.createdAt.toISOString().split('T')[0]
             };
 
+            console.log("reports->", reports)
             setReports([formattedReport, ...reports]);
-            setNewReport({ location: '', type: '', amount: '' });
+            setNewReport({
+                location: '',
+                type: '',
+                amount: ''
+            });
             setFile(null);
             setPreview(null);
             setVerificationStatus('idle');
@@ -207,39 +207,71 @@ export default function ReportPage() {
         }
     };
 
+
+    // useEffect(() => {
+    //     const checkUser = async () => {
+    //         const email = localStorage.getItem('userEmail');
+    //         if (email) {
+    //             let user = await getUserByEmail(email);
+    //             if (!user) {
+    //                 user = (await createUser(email, 'Anonymous User'))!;
+    //             }
+    //             if (user) {
+    //                 setUser(user);
+    //                 const recentReports = await getRecentReports();
+    //                 console.log("recentReports--->", recentReports)
+    //                 if (recentReports) {
+    //                     const formattedReports = (recentReports as any[]).map((report: any) => ({
+    //                         ...report,
+    //                         createdAt: report.createdAt.toISOString().split('T')[0]
+    //                     }));
+    //                     console.log("formattedReports--->", formattedReports)
+    //                     setReports(formattedReports);
+    //                 }
+
+    //             } else {
+    //                 setReports([]);
+    //             }
+    //         } else {
+    //             router.push('/login');
+    //         }
+    //     }
+    //     checkUser();
+    // }, [router]);
+
+
     useEffect(() => {
         const checkUser = async () => {
-            const email = localStorage.getItem('userEmail');
+            const email = localStorage.getItem('userEmail')
             if (email) {
-                let user = await getUserByEmail(email);
+                let user = await getUserByEmail(email)
                 if (!user) {
-                    user = (await createUser(email, 'Anonymous User'))!;
+                    user = (await createUser(email, 'Anonymous User'))!
                 }
-                if (user) {
-                    setUser(user);
-                }
-                const recentReports = await getRecentReports();
+                setUser(user)
+                const recentReports = await getRecentReports()
+                console.log("recentReports------>", recentReports)
                 if (recentReports) {
-                    const formattedReports = (recentReports as any[]).map((report: any) => ({
-                        ...report,
-                        createdAt: report.createdAt.toISOString().split('T')[0]
-                    }));
-                    setReports(formattedReports);
-                } else {
-                    setReports([]);
+                    const formattedReports = recentReports.map((report: any) => ({
+                        id: report.id,
+                        location: report.location,
+                        wasteType: report.wasteType,
+                        amount: report.amount,
+                        createdAt: new Date(report.createdAt).toISOString().split('T')[0]
+                    }))
+                    setReports(formattedReports)
                 }
+
             } else {
-                router.push('/login');
+                router.push('/login')
             }
-        };
-        checkUser();
-    }, [router]);
+        }
+        checkUser()
+    }, [router])
 
     return (
         <div className="p-8 max-w-4xl mx-auto">
-            <h1 className="text-3xl font-semibold mb-6 text-gray-800">
-                Report waste
-            </h1>
+            <h1 className="text-3xl font-semibold mb-6 text-gray-800">Report waste</h1>
 
             <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-lg mb-12">
                 <div className="mb-8">
@@ -302,11 +334,8 @@ export default function ReportPage() {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-
                     <div>
-                        <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-                            Location
-                        </label>
+                        <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
                         {isLoaded ? (
                             <StandaloneSearchBox
                                 onLoad={onLoad}
@@ -336,7 +365,6 @@ export default function ReportPage() {
                             />
                         )}
                     </div>
-
                     <div>
                         <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">Waste Type</label>
                         <input
@@ -352,9 +380,7 @@ export default function ReportPage() {
                         />
                     </div>
                     <div>
-                        <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
-                            Estimated Amount
-                        </label>
+                        <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">Estimated Amount</label>
                         <input
                             type="text"
                             id="amount"

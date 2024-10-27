@@ -5,6 +5,7 @@ import { eq, sql, and, desc } from 'drizzle-orm'
 
 
 // create user
+
 export async function createUser(email: string, name: string) {
     try {
         const [user] = await db.insert(Users).values({ email, name }).returning().execute()
@@ -17,6 +18,7 @@ export async function createUser(email: string, name: string) {
 
 
 // fetch User by Email
+
 export async function getUserByEmail(email: string) {
     try {
         const [user] = await db.select().from(Users).where(eq(Users.email, email)).execute()
@@ -28,6 +30,7 @@ export async function getUserByEmail(email: string) {
 
 
 // getUnreadNotifications
+
 export async function getUnreadNotifications(userId: number) {
     try {
         return await db.select()
@@ -41,6 +44,7 @@ export async function getUnreadNotifications(userId: number) {
 }
 
 // getUserBalance
+
 export async function getUserBalance(userId: number): Promise<number> {
     const transactions = await getRewardTransactions(userId) || []
 
@@ -53,6 +57,11 @@ export async function getUserBalance(userId: number): Promise<number> {
     return Math.max(balance, 0)
 }
 
+
+
+
+
+// getRewardTransactions
 
 export async function getRewardTransactions(userId: number) {
     try {
@@ -82,6 +91,8 @@ export async function getRewardTransactions(userId: number) {
 }
 
 
+// markNotificationAsRead
+
 export async function markNotificationAsRead(notificationId: number) {
     try {
         await db
@@ -97,6 +108,10 @@ export async function markNotificationAsRead(notificationId: number) {
     }
 }
 
+
+
+
+// createReport
 
 export async function createReport(
     userId: number,
@@ -145,6 +160,9 @@ export async function createReport(
 }
 
 
+
+// updateRewardPoints
+
 export async function updateRewardPoints(userId: number, pointsToAdd: number) {
     try {
         const [updateReward] = await db
@@ -160,6 +178,9 @@ export async function updateRewardPoints(userId: number, pointsToAdd: number) {
         return null
     }
 }
+
+
+// createTransaction
 
 export async function createTransaction(
     userId: number,
@@ -188,6 +209,8 @@ export async function createTransaction(
 }
 
 
+// createNotification
+
 export async function createNotification(
     userId: number,
     message: string,
@@ -211,9 +234,14 @@ export async function createNotification(
     }
 }
 
+
+// getRecentReports
+
 export async function getRecentReports(
     limit: number = 10
 ) {
+
+    console.log("hello")
     try {
         const reports = await db
             .select()
@@ -222,9 +250,11 @@ export async function getRecentReports(
             .limit(limit)
             .execute()
 
+        console.log("Fetched reports:", reports) // Add this line
+        return reports
+
     } catch (error) {
         console.error("Error fetching recent reports", error)
         return null
     }
-
 }
