@@ -258,3 +258,34 @@ export async function getRecentReports(
         return null
     }
 }
+
+
+// getAvailableRewards
+export const getAvailableRewards = async (userId: number) => {
+    try {
+        const userTransactions = await getRewardTransactions(userId)
+        const userPoints = userTransactions?.reduce((total: any, transaction: any) => {
+            return transaction.type.startsWith('earned')
+                ? total + transaction.amount
+                : total - transaction.amount
+        }, 0 // accumulator
+        )
+
+        const dbRewards = await db
+            .select({
+                id: Rewards.id,
+                name: Rewards.name,
+                cost: Rewards.points,
+                description: Rewards.description,
+                collectionInfo: Rewards.collectionInfo,
+            })
+            .from(Rewards)
+            .where(eq(Rewards.isAvailable, true))
+            .execute();
+
+
+    } catch (error) {
+
+
+    }
+}

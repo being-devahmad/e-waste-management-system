@@ -4,10 +4,11 @@
 
 import localFont from "next/font/local";
 import "./globals.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import { getAvailableRewards, getUserByEmail } from "../utils/db/actions";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,6 +29,22 @@ export default function RootLayout({
 
   const [sidebarOpen, setSidebarOpen] = useState('')
   const [totalEarnings, setTotalEarnings] = useState(0)
+
+  useEffect(() => {
+    const fetchTotalEarnings = async () => {
+      try {
+        const userEmail = localStorage.getItem("userEmail")
+        if (userEmail) {
+          const user = await getUserByEmail(userEmail)
+          if (user) {
+            const availableResult = await getAvailableRewards()
+          }
+        }
+      } catch (error) {
+
+      }
+    }
+  }, [])
 
   return (
     <html lang="en">
