@@ -58,7 +58,7 @@ export const Notifications = pgTable('notifications', {
 // Transactions model
 export const Transactions = pgTable('transactions', {
     id: serial('id').primaryKey(),
-    userId: integer("user_id").references(() => Users.id).notNull(), // in reference with the users table 
+    userId: integer("user_id").references(() => Users.id).notNull(), // in reference with the users tables
     type: varchar('type', { length: 20 }).notNull(),
     amount: integer('amount').notNull(),
     description: text('description').notNull(),
