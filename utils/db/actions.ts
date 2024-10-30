@@ -173,6 +173,8 @@ export async function updateRewardPoints(userId: number, pointsToAdd: number) {
             .where(eq(Rewards.userId, userId))
             .returning()
             .execute()
+
+        return updateReward
     } catch (error) {
         console.error('Error updating reward points', error)
         return null
@@ -181,7 +183,6 @@ export async function updateRewardPoints(userId: number, pointsToAdd: number) {
 
 
 // createTransaction
-
 export async function createTransaction(
     userId: number,
     type: 'earned_report' | 'earned_collect' | 'redeemed',
@@ -210,7 +211,6 @@ export async function createTransaction(
 
 
 // createNotification
-
 export async function createNotification(
     userId: number,
     message: string,
@@ -236,7 +236,6 @@ export async function createNotification(
 
 
 // getRecentReports
-
 export async function getRecentReports(
     limit: number = 10
 ) {
@@ -263,7 +262,7 @@ export async function getRecentReports(
 // getAvailableRewards
 export const getAvailableRewards = async (userId: number) => {
     try {
-        const userTransactions = await getRewardTransactions(userId)
+        const userTransactions = await getRewardTransactions(userId) as any
         const userPoints = userTransactions?.reduce((total: any, transaction: any) => {
             return transaction.type.startsWith('earned')
                 ? total + transaction.amount
@@ -283,9 +282,26 @@ export const getAvailableRewards = async (userId: number) => {
             .where(eq(Rewards.isAvailable, true))
             .execute();
 
+        console.log('Rewards from database:', dbRewards);
+
+        // Combine user points and database rewards
+        const allRewards = [
+            {
+                id: 0, // Use a special ID for user's points
+                name: "Your Points",
+                cost: userPoints,
+                description: "Redeem your earned points",
+                collectionInfo: "Points earned from reporting and collecting waste"
+            },
+            ...dbRewards
+        ];
+
+        console.log('All available rewards:', allRewards);
+        return allRewards;
+
 
     } catch (error) {
-
-
+        console.error("Error fetching available rewards:", error);
+        return [];
     }
 }

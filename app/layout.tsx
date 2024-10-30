@@ -37,13 +37,15 @@ export default function RootLayout({
         if (userEmail) {
           const user = await getUserByEmail(userEmail)
           if (user) {
-            const availableResult = await getAvailableRewards()
+            const availableRewards = await getAvailableRewards(user.id)
+            setTotalEarnings(availableRewards)
           }
         }
       } catch (error) {
-
+        console.log("Error fetching total earnings -->", error)
       }
     }
+    fetchTotalEarnings()
   }, [])
 
   return (
