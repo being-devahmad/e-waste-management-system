@@ -305,3 +305,13 @@ export const getAvailableRewards = async (userId: number) => {
         return [];
     }
 }
+
+
+// getWasteCollectionTasks
+export const getWasteCollectionTasks = async () => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
